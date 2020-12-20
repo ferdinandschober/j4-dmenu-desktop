@@ -47,10 +47,6 @@ public:
             fprintf(stderr, "%s\n", s.c_str());
 #endif
 
-        if(!wait_on) {
-            this->dmenu = new Dmenu(this->dmenu_command);
-        }
-
         collect_files();
 
         // Sort applications by displayed name
@@ -216,6 +212,9 @@ private:
         if(chdir(original_wd)) {
             pfatale("collect_files: chdir(original_cwd)");
         }
+
+        fprintf(stderr, "Read %d .desktop files, found %lu apps.\n", parsed_files, apps.size());
+
     }
 
     void handle_file(const std::string &file, const std::string &base_path) {
@@ -240,9 +239,7 @@ private:
     }
 
     int do_dmenu(const std::vector<std::pair<std::string, const Application *>> &iteration_order) {
-        if(wait_on) {
-            this->dmenu = new Dmenu(this->dmenu_command);
-        }
+		this->dmenu = new Dmenu(this->dmenu_command);
 
         // Transfer the list to dmenu
         for(auto &app : iteration_order) {
@@ -314,8 +311,6 @@ private:
         std::string choice;
         std::string args;
         Application *app;
-
-        fprintf(stderr, "Read %d .desktop files, found %lu apps.\n", parsed_files, apps.size());
 
         choice = dmenu->read_choice(); // Blocks
         if(choice.empty())
